@@ -193,4 +193,22 @@ export default function Adjustments() {
                 </div>
               </div>
               <input placeholder="Reason (e.g., Damaged)" value={formData.reason} onChange={e => setFormData({...formData, reason: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
-              <select value={formData.status} onChange={e => setFormData({...formData, status
+              <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none">
+                <option value="draft">Draft</option>
+                <option value="done">Done</option>
+                <option value="waiting">Waiting</option>
+              </select>
+              <div className="pt-4 flex justify-end gap-3 border-t border-border/50 mt-4">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors">Cancel</button>
+                <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg flex items-center gap-2 hover:opacity-90 transition-opacity">
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />} 
+                  Save
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+    </div>
+  );
+}
