@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 export default function Profile() {
 
   const { data: session, status } = useSession();
+    const emailInitial = session?.user?.name?.[0].toUpperCase() ?? "?";
 
   if (status === "loading") {
     return <div className="p-10">Loading...</div>;
@@ -21,10 +22,9 @@ export default function Profile() {
 
       <div className="bg-white p-8 rounded-xl shadow w-96 text-center">
 
-        <img
-          src={session.user?.image || "https://i.pravatar.cc/100"}
-          className="w-20 h-20 rounded-full mx-auto mb-4"
-        />
+        <div className="w-24 h-24 bg-indigo-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+          {emailInitial}
+        </div>
 
         <h2 className="text-xl font-bold">
           {session.user?.name}

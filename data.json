@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Laptop Dell Inspiron 15",
+    "sku": "LAP-001",
+    "category": "Electronics",
+    "unit": "pcs",
+    "stock": 25
+  },
+  {
+    "name": "Wireless Mouse Logitech",
+    "sku": "MOU-002",
+    "category": "Electronics",
+    "unit": "pcs",
+    "stock": 60
+  },
+  {
+    "name": "Mechanical Keyboard RGB",
+    "sku": "KEY-003",
+    "category": "Electronics",
+    "unit": "pcs",
+    "stock": 40
+  },
+  {
+    "name": "USB-C Charging Cable",
+    "sku": "CAB-004",
+    "category": "Accessories",
+    "unit": "pcs",
+    "stock": 120
+  },
+  {
+    "name": "27 inch LED Monitor",
+    "sku": "MON-005",
+    "category": "Electronics",
+    "unit": "pcs",
+    "stock": 18
+  },
+  {
+    "name": "Office Chair Ergonomic",
+    "sku": "CHA-006",
+    "category": "Furniture",
+    "unit": "pcs",
+    "stock": 12
+  },
+  {
+    "name": "Wooden Office Desk",
+    "sku": "DES-007",
+    "category": "Furniture",
+    "unit": "pcs",
+    "stock": 9
+  },
+  {
+    "name": "Printer HP LaserJet",
+    "sku": "PRI-008",
+    "category": "Electronics",
+    "unit": "pcs",
+    "stock": 7
+  },
+  {
+    "name": "A4 Paper Pack 500 Sheets",
+    "sku": "PAP-009",
+    "category": "Stationery",
+    "unit": "pack",
+    "stock": 150
+  },
+  {
+    "name": "Stapler Heavy Duty",
+    "sku": "STA-010",
+    "category": "Stationery",
+    "unit": "pcs",
+    "stock": 45
+  },
+  {
+    "name": "Whiteboard Marker Set",
+    "sku": "MAR-011",
+    "category": "Stationery",
+    "unit": "set",
+    "stock": 30
+  },
+  {
+    "name": "External SSD 1TB",
+    "sku": "SSD-012",
+    "category": "Electronics",
+    "unit": "pcs",
+    "stock": 20
+  }
+]

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession, signOut, signIn } from "next-auth/react";
 import { useState } from "react";
 
-export default function Navigation() {
+export default function Navbar() {
+
   const { data: session } = useSession();
-  const [openMenu, setOpenMenu] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const getInitial = () => {
     const name = session?.user?.name || session?.user?.email || "";
@@ -17,62 +18,108 @@ export default function Navigation() {
     <>
       {/* NAVBAR */}
 
-      <nav className="flex items-center justify-between px-6 py-3 bg-white border-b shadow-sm">
+      <nav className="w-full flex items-center justify-between px-6 py-3 bg-white border-b shadow-sm">
 
-        <Link href="/dashboard" className="text-xl font-bold text-indigo-600">
+        {/* Logo */}
+
+        <Link
+          href="/dashboard"
+          className="text-xl font-bold text-indigo-600"
+        >
           CoreInventory
         </Link>
 
-        {/* Linear Navigation */}
 
-        <div className="flex gap-6 text-sm font-medium text-gray-700">
-          <Link href="/products" className="hover:text-indigo-600">Products</Link>
-          <Link href="/receipts" className="hover:text-indigo-600">Receipts</Link>
-          <Link href="/delivery" className="hover:text-indigo-600">Delivery Orders</Link>
-          <Link href="/adjustment" className="hover:text-indigo-600">Inventory Adjustment</Link>
-          <Link href="/moves" className="hover:text-indigo-600">Move History</Link>
-          <Link href="/dashboard" className="hover:text-indigo-600">Dashboard</Link>
-          <Link href="/settings/warehouse" className="hover:text-indigo-600">Settings</Link>
+        {/* Navigation */}
+
+        <div className="flex items-center gap-6 text-sm font-medium text-gray-700">
+
+          <Link href="/products" className="hover:text-indigo-600">
+            Products
+          </Link>
+
+          <Link href="#" className="hover:text-indigo-600">
+            Receipts
+          </Link>
+
+          <Link href="#" className="hover:text-indigo-600">
+            Delivery Orders
+          </Link>
+
+          <Link href="#" className="hover:text-indigo-600">
+            Inventory Adjustment
+          </Link>
+
+          <Link href="#" className="hover:text-indigo-600">
+            Move History
+          </Link>
+
+          <Link href="/dashboard" className="hover:text-indigo-600">
+            Dashboard
+          </Link>
+
+          <Link href="#" className="hover:text-indigo-600">
+            Settings
+          </Link>
+
         </div>
 
-        {/* Avatar */}
 
-        {session && (
+        {/* Right Side (Login OR Avatar) */}
+
+        {!session ? (
+
+          <button
+            onClick={() => signIn()}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Login
+          </button>
+
+        ) : (
+
           <div
-            onClick={() => setOpenMenu(true)}
+            onClick={() => setProfileOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-600 text-white font-semibold cursor-pointer hover:bg-indigo-700"
           >
             {getInitial()}
           </div>
+
         )}
+
       </nav>
+
 
       {/* DARK OVERLAY */}
 
-      {openMenu && (
+      {profileOpen && (
         <div
-          onClick={() => setOpenMenu(false)}
+          onClick={() => setProfileOpen(false)}
           className="fixed inset-0 bg-black/30 z-40"
         />
       )}
 
-      {/* SLIDE SIDEBAR */}
+
+      {/* PROFILE SIDEBAR */}
 
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 
-        ${openMenu ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300
+        ${profileOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
+
         <div className="p-6">
 
-          <h2 className="text-lg font-semibold mb-6">Profile Menu</h2>
+          <h2 className="text-lg font-semibold mb-6">
+            Profile Menu
+          </h2>
 
           <ul className="space-y-3">
 
             <li>
               <Link
                 href="/profile"
+                onClick={() => setProfileOpen(false)}
                 className="block px-3 py-2 rounded hover:bg-gray-100"
-                onClick={() => setOpenMenu(false)}
               >
                 My Profile
               </Link>
@@ -90,6 +137,7 @@ export default function Navigation() {
           </ul>
 
         </div>
+
       </div>
     </>
   );

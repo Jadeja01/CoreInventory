@@ -131,14 +131,6 @@ export default function Dashboard() {
           Warehouse Dashboard
         </h1>
 
-        <span className="text-sm text-gray-400">
-          {new Date().toLocaleDateString("en-GB", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </span>
       </div>
 
       {/* KPI Grid */}
