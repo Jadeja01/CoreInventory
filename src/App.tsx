@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AppLayout } from "@/components/AppLayout";
-import { ProtectedRoutes } from "@/components/ProtectedRoutes";
+import { ProtectedRoute } from "@/components/ProtectedRoutes";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Receipts from "./pages/Receipts";
@@ -36,7 +36,7 @@ const App = () => (
               <Route path="/forgot-password" element={<ForgotPassword />} />
               
               {/* PROTECTED ROUTES: Only logged-in users get past this point */}
-              <Route element={<ProtectedRoutes />}>
+              <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/receipts" element={<Receipts />} />
