@@ -1,3 +1,5 @@
 # CoreInventory
 
-Odoo x Indus University Hackathon 
+Odoo x Indus University Hackathon
+
+#Priorities this solution
