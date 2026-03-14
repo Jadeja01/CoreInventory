@@ -1,31 +1,22 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import Navbar from "./(commponent)/Navbar";
 
 export default function Home() {
+
+  const { data: session } = useSession();
+
   return (
     <main className="min-h-screen bg-gray-50 text-gray-800">
-
-      {/* Navbar */}
-      <nav className="flex items-center justify-between px-10 py-5 bg-white shadow">
-        <h1 className="text-2xl font-bold text-indigo-600">
-          CoreInventory
-        </h1>
-
-        <div className="flex items-center gap-6">
-          <a className="hover:text-indigo-600 cursor-pointer">Features</a>
-          <a className="hover:text-indigo-600 cursor-pointer">About</a>
-          <a className="hover:text-indigo-600 cursor-pointer">Contact</a>
-
-          <button className="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-            Login
-          </button>
-        </div>
-      </nav>
-
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-10 py-24 flex flex-col md:flex-row items-center justify-between">
 
         <div className="max-w-xl">
+
           <h2 className="text-5xl font-bold leading-tight mb-6">
             Smart Inventory <br/> Management System
           </h2>
@@ -36,6 +27,7 @@ export default function Home() {
           </p>
 
           <div className="flex gap-4">
+
             <button className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
               Get Started
             </button>
@@ -43,15 +35,19 @@ export default function Home() {
             <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100">
               Live Demo
             </button>
+
           </div>
+
         </div>
 
         <div className="mt-12 md:mt-0">
+
           <img
             src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d"
             alt="warehouse"
             className="w-[500px] rounded-xl shadow-lg"
           />
+
         </div>
 
       </section>
@@ -59,6 +55,7 @@ export default function Home() {
 
       {/* Features */}
       <section className="bg-white py-20">
+
         <div className="max-w-6xl mx-auto px-10 text-center">
 
           <h2 className="text-4xl font-bold mb-14">
@@ -68,38 +65,48 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-10">
 
             <div className="p-8 bg-gray-50 rounded-xl shadow hover:shadow-lg transition">
+
               <h3 className="text-xl font-semibold mb-3">
                 Product Management
               </h3>
+
               <p className="text-gray-600">
                 Create products, manage SKUs, track stock levels,
                 and organize items by categories.
               </p>
+
             </div>
 
             <div className="p-8 bg-gray-50 rounded-xl shadow hover:shadow-lg transition">
+
               <h3 className="text-xl font-semibold mb-3">
                 Warehouse Operations
               </h3>
+
               <p className="text-gray-600">
                 Handle incoming receipts, delivery orders,
                 internal transfers, and stock adjustments.
               </p>
+
             </div>
 
             <div className="p-8 bg-gray-50 rounded-xl shadow hover:shadow-lg transition">
+
               <h3 className="text-xl font-semibold mb-3">
                 Real-time Dashboard
               </h3>
+
               <p className="text-gray-600">
                 Monitor low stock alerts, deliveries,
                 and warehouse activity instantly.
               </p>
+
             </div>
 
           </div>
 
         </div>
+
       </section>
 
 
