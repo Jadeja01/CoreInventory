@@ -1,16 +1,21 @@
-import { Package, Plus, Search, Filter } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Package, Plus, Search, Filter, Loader2 } from "lucide-react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { motion } from "framer-motion";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
-const products = [
-  { sku: "STL-ROD-50", name: "Steel Rods (50mm)", category: "Raw Materials", uom: "kg", stock: 450, location: "Warehouse A", status: "ready" as const },
-  { sku: "ALM-SHT-2M", name: "Aluminum Sheets (2m)", category: "Raw Materials", uom: "pcs", stock: 120, location: "Warehouse A", status: "ready" as const },
-  { sku: "CPR-WRE-2M", name: "Copper Wire (2mm)", category: "Raw Materials", uom: "m", stock: 8, location: "Warehouse B", status: "draft" as const },
-  { sku: "PVC-PPE-4I", name: "PVC Pipes (4\")", category: "Finished Goods", uom: "pcs", stock: 340, location: "Warehouse A", status: "ready" as const },
-  { sku: "STL-BLT-M8", name: "Steel Bolts M8", category: "Components", uom: "pcs", stock: 3, location: "Warehouse C", status: "waiting" as const },
-  { sku: "GLS-PNL-1M", name: "Glass Panels (1m)", category: "Finished Goods", uom: "pcs", stock: 55, location: "Warehouse B", status: "ready" as const },
-  { sku: "RBR-GSK-SM", name: "Rubber Gaskets (SM)", category: "Components", uom: "pcs", stock: 0, location: "Warehouse A", status: "canceled" as const },
-];
+// 1. Define the TypeScript shape based on your DB and UI
+interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  category: string;
+  uom: string;
+  stock: number;
+  location: string;
+  status: "ready" | "draft" | "waiting" | "canceled";
+}
 
 const container = {
   hidden: { opacity: 0 },
@@ -18,6 +23,33 @@ const container = {
 };
 
 export default function Products() {
+  // 2. Add State for the DB data
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 3. Fetch data on load
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      if (data) setProducts(data as Product[]);
+      
+    } catch (error: any) {
+      toast.error("Failed to load inventory: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -60,26 +92,47 @@ export default function Products() {
                 <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            <motion.tbody variants={container} initial="hidden" animate="show">
-              {products.map((product) => (
-                <motion.tr
-                  key={product.sku}
-                  variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
-                  className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
-                >
-                  <td className="px-6 py-4 font-mono-tabular text-xs text-muted-foreground">{product.sku}</td>
-                  <td className="px-6 py-4 font-medium">{product.name}</td>
-                  <td className="px-6 py-4 text-muted-foreground hidden md:table-cell">{product.category}</td>
-                  <td className="px-6 py-4 text-right font-mono-tabular font-medium">
-                    <span className={product.stock <= 5 ? "text-destructive" : ""}>
-                      {product.stock} <span className="text-muted-foreground text-xs">{product.uom}</span>
-                    </span>
+            
+            {/* 4. Handle Loading State gracefully */}
+            {loading ? (
+              <tbody>
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    Loading inventory...
                   </td>
-                  <td className="px-6 py-4 text-muted-foreground hidden sm:table-cell">{product.location}</td>
-                  <td className="px-6 py-4"><StatusBadge status={product.status} /></td>
-                </motion.tr>
-              ))}
-            </motion.tbody>
+                </tr>
+              </tbody>
+            ) : (
+              <motion.tbody variants={container} initial="hidden" animate="show">
+                {products.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
+                      No products found. Add one to get started!
+                    </td>
+                  </tr>
+                ) : (
+                  products.map((product) => (
+                    <motion.tr
+                      key={product.id} // Changed to use DB ID
+                      variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+                      className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
+                    >
+                      <td className="px-6 py-4 font-mono-tabular text-xs text-muted-foreground">{product.sku}</td>
+                      <td className="px-6 py-4 font-medium">{product.name}</td>
+                      <td className="px-6 py-4 text-muted-foreground hidden md:table-cell">{product.category}</td>
+                      <td className="px-6 py-4 text-right font-mono-tabular font-medium">
+                        <span className={product.stock <= 5 ? "text-destructive" : ""}>
+                          {product.stock} <span className="text-muted-foreground text-xs">{product.uom}</span>
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-muted-foreground hidden sm:table-cell">{product.location}</td>
+                      <td className="px-6 py-4"><StatusBadge status={product.status} /></td>
+                    </motion.tr>
+                  ))
+                )}
+              </motion.tbody>
+            )}
           </table>
         </div>
       </div>
