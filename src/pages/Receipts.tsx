@@ -5,22 +5,24 @@ import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
-interface Receipt {
-  id: string;
-  record_id: string;
-  supplier: string;
-  products: string;
-  qty: string;
-  status: "ready" | "draft" | "waiting" | "done" | "canceled";
-  date: string;
+interface Transfer { 
+  id: string; 
+  record_id: string; 
+  from_loc: string; 
+  to_loc: string; 
+  product: string; 
+  qty: string; 
+  status: "ready" | "draft" | "waiting" | "done" | "canceled"; 
+  date: string; 
 }
 
 const initialForm = { 
   record_id: "", 
-  supplier: "", 
-  products: "", 
+  from_loc: "", 
+  to_loc: "", 
+  product: "", 
   qty: "", 
-  status: "waiting" as const, 
+  status: "draft" as const, 
   date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) 
 };
 
@@ -29,8 +31,8 @@ const container = {
   show: { opacity: 1, transition: { staggerChildren: 0.04 } } 
 };
 
-export default function Receipts() {
-  const [data, setData] = useState<Receipt[]>([]);
+export default function Transfers() {
+  const [data, setData] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,14 +45,14 @@ export default function Receipts() {
   const fetchData = async () => {
     setLoading(true);
     const { data: records, error } = await supabase
-      .from("receipts")
+      .from("transfers")
       .select("*")
       .order("created_at", { ascending: false });
       
     if (error) {
-      toast.error("Error loading receipts: " + error.message);
+      toast.error("Error loading transfers: " + error.message);
     } else {
-      setData(records as Receipt[]);
+      setData(records as Transfer[]);
     }
     setLoading(false);
   };
@@ -58,15 +60,15 @@ export default function Receipts() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const { error } = await supabase.from("receipts").insert([formData]);
+    const { error } = await supabase.from("transfers").insert([formData]);
     
     if (error) {
       toast.error("Error: " + error.message);
     } else {
-      toast.success("Receipt added!");
-      setIsModalOpen(false);
-      setFormData(initialForm);
-      fetchData();
+      toast.success("Transfer added!"); 
+      setIsModalOpen(false); 
+      setFormData(initialForm); 
+      fetchData(); 
     }
     setIsSubmitting(false);
   };
@@ -75,22 +77,22 @@ export default function Receipts() {
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Receipts</h1>
-          <p className="text-muted-foreground text-sm">Track incoming goods from suppliers.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Internal Transfers</h1>
+          <p className="text-muted-foreground text-sm">Move stock between warehouses and locations.</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)} 
-          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold shadow-ceramic btn-press inner-glow hover:shadow-ceramic-hover transition-all"
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold shadow-ceramic btn-press hover:shadow-ceramic-hover transition-all"
         >
           <Plus className="h-4 w-4" /> 
-          New Receipt
+          New Transfer
         </button>
       </div>
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input 
-          placeholder="Search receipts..." 
+          placeholder="Search transfers..." 
           className="w-full bg-card border-2 border-transparent focus:border-primary/30 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none transition-colors shadow-ceramic placeholder:text-muted-foreground" 
         />
       </div>
@@ -101,11 +103,11 @@ export default function Receipts() {
             <thead>
               <tr className="border-b border-border/50">
                 <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">ID</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Supplier</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Products</th>
-                <th className="text-right px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quantity</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">From</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">To</th>
+                <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden md:table-cell">Product</th>
+                <th className="text-right px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Qty</th>
                 <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">Date</th>
               </tr>
             </thead>
             {loading ? (
@@ -122,22 +124,22 @@ export default function Receipts() {
                 {data.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
-                      No receipts found. Create one to get started.
+                      No transfers found. Create one to get started.
                     </td>
                   </tr>
                 ) : (
-                  data.map((r) => (
+                  data.map((t) => (
                     <motion.tr 
-                      key={r.id} 
+                      key={t.id} 
                       variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }} 
                       className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
                     >
-                      <td className="px-6 py-4 font-mono-tabular text-xs text-muted-foreground">{r.record_id}</td>
-                      <td className="px-6 py-4 font-medium">{r.supplier}</td>
-                      <td className="px-6 py-4 text-muted-foreground hidden md:table-cell">{r.products}</td>
-                      <td className="px-6 py-4 text-right font-mono-tabular font-medium">{r.qty}</td>
-                      <td className="px-6 py-4"><StatusBadge status={r.status} /></td>
-                      <td className="px-6 py-4 text-muted-foreground hidden sm:table-cell">{r.date}</td>
+                      <td className="px-6 py-4 font-mono-tabular text-xs text-muted-foreground">{t.record_id}</td>
+                      <td className="px-6 py-4 font-medium">{t.from_loc}</td>
+                      <td className="px-6 py-4 font-medium">{t.to_loc}</td>
+                      <td className="px-6 py-4 text-muted-foreground hidden md:table-cell">{t.product}</td>
+                      <td className="px-6 py-4 text-right font-mono-tabular font-medium">{t.qty}</td>
+                      <td className="px-6 py-4"><StatusBadge status={t.status} /></td>
                     </motion.tr>
                   ))
                 )}
@@ -155,20 +157,22 @@ export default function Receipts() {
             className="w-full max-w-md bg-card border border-border/50 rounded-2xl shadow-xl overflow-hidden"
           >
             <div className="flex items-center justify-between p-6 border-b border-border/50">
-              <h2 className="text-xl font-semibold">New Receipt</h2>
+              <h2 className="text-xl font-semibold">New Transfer</h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <form onSubmit={handleAdd} className="p-6 space-y-4">
-              <input required placeholder="Receipt ID (e.g., REC-006)" value={formData.record_id} onChange={e => setFormData({...formData, record_id: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
-              <input required placeholder="Supplier Name" value={formData.supplier} onChange={e => setFormData({...formData, supplier: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
-              <input required placeholder="Products (e.g., Steel Rods)" value={formData.products} onChange={e => setFormData({...formData, products: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
-              <input required placeholder="Quantity (e.g., 100 kg)" value={formData.qty} onChange={e => setFormData({...formData, qty: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
+              <input required placeholder="Transfer ID (e.g., TRF-022)" value={formData.record_id} onChange={e => setFormData({...formData, record_id: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
+              <input required placeholder="From Location" value={formData.from_loc} onChange={e => setFormData({...formData, from_loc: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
+              <input required placeholder="To Location" value={formData.to_loc} onChange={e => setFormData({...formData, to_loc: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
+              <input required placeholder="Product" value={formData.product} onChange={e => setFormData({...formData, product: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
+              <input required placeholder="Quantity (e.g., 50 m)" value={formData.qty} onChange={e => setFormData({...formData, qty: e.target.value})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none" />
               <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-primary/50 outline-none">
+                <option value="draft">Draft</option>
+                <option value="ready">Ready</option>
                 <option value="waiting">Waiting</option>
                 <option value="done">Done</option>
-                <option value="draft">Draft</option>
               </select>
               <div className="pt-4 flex justify-end gap-3 border-t border-border/50 mt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors">Cancel</button>
