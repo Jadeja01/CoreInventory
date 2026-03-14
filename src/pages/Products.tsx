@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { Package, Plus, Search, Filter, Loader2 } from "lucide-react";
+import { Package, Plus, Search, Filter, Loader2, X } from "lucide-react"; // NEW: Imported 'X' for the close button
 import { StatusBadge } from "@/components/StatusBadge";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
-// 1. Define the TypeScript shape based on your DB and UI
 interface Product {
   id: string;
   sku: string;
@@ -22,12 +21,26 @@ const container = {
   show: { opacity: 1, transition: { staggerChildren: 0.04 } },
 };
 
+// NEW: Default state for a blank form
+const initialFormState = {
+  name: "",
+  sku: "",
+  category: "Raw Materials",
+  uom: "pcs",
+  stock: 0,
+  location: "Warehouse A",
+  status: "ready" as const,
+};
+
 export default function Products() {
-  // 2. Add State for the DB data
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // NEW: State to control the modal and form data
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState(initialFormState);
 
-  // 3. Fetch data on load
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -42,11 +55,36 @@ export default function Products() {
 
       if (error) throw error;
       if (data) setProducts(data as Product[]);
-      
     } catch (error: any) {
       toast.error("Failed to load inventory: " + error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // NEW: Function to handle form submission
+  const handleAddProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // 1. Insert the data into Supabase
+      const { error } = await supabase
+        .from("products")
+        .insert([formData]);
+
+      if (error) throw error;
+
+      // 2. Success! Show a toast, close modal, clear form, and refresh the list
+      toast.success("Product added successfully!");
+      setIsModalOpen(false);
+      setFormData(initialFormState);
+      fetchProducts(); 
+      
+    } catch (error: any) {
+      toast.error("Failed to add product: " + error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -57,7 +95,12 @@ export default function Products() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Products</h1>
           <p className="text-muted-foreground text-sm">Manage your product catalog and stock levels.</p>
         </div>
-        <button className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold shadow-ceramic btn-press inner-glow hover:shadow-ceramic-hover transition-all">
+        
+        {/* NEW: Added onClick handler to open the modal */}
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-sm font-semibold shadow-ceramic btn-press inner-glow hover:shadow-ceramic-hover transition-all"
+        >
           <Plus className="h-4 w-4" />
           Add Product
         </button>
@@ -92,8 +135,6 @@ export default function Products() {
                 <th className="text-left px-6 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            
-            {/* 4. Handle Loading State gracefully */}
             {loading ? (
               <tbody>
                 <tr>
@@ -114,7 +155,7 @@ export default function Products() {
                 ) : (
                   products.map((product) => (
                     <motion.tr
-                      key={product.id} // Changed to use DB ID
+                      key={product.id}
                       variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
                       className="border-b border-border/30 hover:bg-muted/30 transition-colors cursor-pointer"
                     >
@@ -136,6 +177,138 @@ export default function Products() {
           </table>
         </div>
       </div>
+
+      {/* NEW: The Add Product Modal Overlay */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md bg-card border border-border/50 rounded-2xl shadow-xl overflow-hidden"
+          >
+            <div className="flex items-center justify-between p-6 border-b border-border/50">
+              <h2 className="text-xl font-semibold">Add New Product</h2>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddProduct} className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">Product Name</label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    placeholder="e.g. Copper Wire (2mm)"
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">SKU</label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.sku}
+                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    placeholder="e.g. CW-02-018"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="Raw Materials">Raw Materials</option>
+                    <option value="Components">Components</option>
+                    <option value="Finished Goods">Finished Goods</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">Initial Stock</label>
+                  <input
+                    required
+                    type="number"
+                    min="0"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0 })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">Unit of Measure</label>
+                  <select
+                    value={formData.uom}
+                    onChange={(e) => setFormData({ ...formData, uom: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="pcs">Pieces (pcs)</option>
+                    <option value="kg">Kilograms (kg)</option>
+                    <option value="m">Meters (m)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">Location</label>
+                  <select
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="Warehouse A">Warehouse A</option>
+                    <option value="Warehouse B">Warehouse B</option>
+                    <option value="Warehouse C">Warehouse C</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground">Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                    className="w-full bg-background border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  >
+                    <option value="ready">Ready</option>
+                    <option value="draft">Draft</option>
+                    <option value="waiting">Waiting</option>
+                    <option value="canceled">Canceled</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3 border-t border-border/50 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 text-sm font-medium text-primary-foreground bg-primary rounded-lg shadow-ceramic hover:shadow-ceramic-hover transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                  Save Product
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
