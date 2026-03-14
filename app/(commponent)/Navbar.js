@@ -1,144 +1,147 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut, signIn } from "next-auth/react";
-import { useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 
-export default function Navbar() {
+export default function Sidebar() {
+  const { data: session, status } = useSession();
 
-  const { data: session } = useSession();
-  const [profileOpen, setProfileOpen] = useState(false);
-
-  const getInitial = () => {
-    const name = session?.user?.name || session?.user?.email || "";
-    return name.charAt(0).toUpperCase();
-  };
+  if (status === "loading") {
+    return (
+      <aside className="w-64 bg-white border-r min-h-screen p-6">
+        <p className="text-gray-400 text-sm">Loading...</p>
+      </aside>
+    );
+  }
 
   return (
-    <>
-      {/* NAVBAR */}
+    <aside className="w-64 bg-white border-r min-h-screen p-6">
 
-      <nav className="w-full flex items-center justify-between px-6 py-3 bg-white border-b shadow-sm">
+      <h2 className="text-sm font-semibold text-gray-400 uppercase mb-6">
+        Navigation
+      </h2>
 
-        {/* Logo */}
+      <div className="space-y-4">
 
-        <Link
-          href="/dashboard"
-          className="text-xl font-bold text-indigo-600"
-        >
-          CoreInventory
+        {/* Main Links */}
+        <Link href="/dashboard" className="block hover:text-indigo-600">
+          Dashboard
         </Link>
 
+        <Link href="/products" className="block hover:text-indigo-600">
+          Products
+        </Link>
 
-        {/* Navigation */}
+        {/* Operations */}
+        <div className="pt-4">
 
-        <div className="flex items-center gap-6 text-sm font-medium text-gray-700">
+          <p className="text-xs text-gray-400 uppercase mb-2">
+            Operations
+          </p>
 
-          <Link href="/products" className="hover:text-indigo-600">
-            Products
-          </Link>
+          <div className="space-y-2 ml-2">
 
-          <Link href="#" className="hover:text-indigo-600">
-            Receipts
-          </Link>
+            <Link
+              href="/operations/receipts"
+              className="block hover:text-indigo-600"
+            >
+              Receipts
+            </Link>
 
-          <Link href="#" className="hover:text-indigo-600">
-            Delivery Orders
-          </Link>
+            <Link
+              href="/operations/deliveries"
+              className="block hover:text-indigo-600"
+            >
+              Delivery Orders
+            </Link>
 
-          <Link href="#" className="hover:text-indigo-600">
-            Inventory Adjustment
-          </Link>
+            <Link
+              href="/operations/adjustments"
+              className="block hover:text-indigo-600"
+            >
+              Inventory Adjustment
+            </Link>
 
-          <Link href="#" className="hover:text-indigo-600">
-            Move History
-          </Link>
+            <Link
+              href="/operations/history"
+              className="block hover:text-indigo-600"
+            >
+              Move History
+            </Link>
 
-          <Link href="/dashboard" className="hover:text-indigo-600">
-            Dashboard
-          </Link>
+          </div>
+        </div>
 
-          <Link href="#" className="hover:text-indigo-600">
+        {/* Settings */}
+        <div className="pt-4">
+
+          <p className="text-xs text-gray-400 uppercase mb-2">
             Settings
+          </p>
+
+          <Link
+            href="/settings/warehouse"
+            className="block hover:text-indigo-600 ml-2"
+          >
+            Warehouse
           </Link>
 
         </div>
 
+        {/* Profile Section */}
+        <div className="pt-4">
 
-        {/* Right Side (Login OR Avatar) */}
+          <p className="text-xs text-gray-400 uppercase mb-2">
+            Profile
+          </p>
 
-        {!session ? (
+          {session ? (
+            <>
+              {/* Avatar + Name */}
+              <div className="flex items-center gap-3 ml-2 mb-3">
+                <img
+                  src={session.user?.image || "/default-avatar.png"}
+                  alt="avatar"
+                  className="w-9 h-9 rounded-full border"
+                />
 
-          <button
-            onClick={() => signIn()}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-          >
-            Login
-          </button>
+                <div>
+                  <p className="text-sm font-medium">
+                    {session.user?.name}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {session.user?.email}
+                  </p>
+                </div>
+              </div>
 
-        ) : (
-
-          <div
-            onClick={() => setProfileOpen(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-indigo-600 text-white font-semibold cursor-pointer hover:bg-indigo-700"
-          >
-            {getInitial()}
-          </div>
-
-        )}
-
-      </nav>
-
-
-      {/* DARK OVERLAY */}
-
-      {profileOpen && (
-        <div
-          onClick={() => setProfileOpen(false)}
-          className="fixed inset-0 bg-black/30 z-40"
-        />
-      )}
-
-
-      {/* PROFILE SIDEBAR */}
-
-      <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300
-        ${profileOpen ? "translate-x-0" : "-translate-x-full"}`}
-      >
-
-        <div className="p-6">
-
-          <h2 className="text-lg font-semibold mb-6">
-            Profile Menu
-          </h2>
-
-          <ul className="space-y-3">
-
-            <li>
               <Link
                 href="/profile"
-                onClick={() => setProfileOpen(false)}
-                className="block px-3 py-2 rounded hover:bg-gray-100"
+                className="block hover:text-indigo-600 ml-2"
               >
                 My Profile
               </Link>
-            </li>
 
-            <li>
               <button
                 onClick={() => signOut()}
-                className="w-full text-left px-3 py-2 rounded text-red-500 hover:bg-red-50"
+                className="block text-left w-full hover:text-red-500 ml-2"
               >
                 Logout
               </button>
-            </li>
-
-          </ul>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="block hover:text-indigo-600 ml-2"
+            >
+              Login
+            </Link>
+          )}
 
         </div>
 
       </div>
-    </>
+
+    </aside>
   );
 }
