@@ -16,6 +16,8 @@ import Warehouses from "./pages/Warehouses";
 import SettingsPage from "./pages/SettingsPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import SignIn from "./pages/SignIn";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,8 @@ const App = () => (
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AppLayout>
             <Routes>
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/" element={<Dashboard />} />
               <Route path="/products" element={<Products />} />
               <Route path="/receipts" element={<Receipts />} />
