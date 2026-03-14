@@ -48,7 +48,7 @@ export default function Deliveries() {
       .order("created_at", { ascending: false });
       
     if (error) {
-      toast.error(error.message);
+      toast.error("Error loading deliveries: " + error.message);
     } else {
       setData(records as Delivery[]);
     }
@@ -61,7 +61,7 @@ export default function Deliveries() {
     const { error } = await supabase.from("deliveries").insert([formData]);
     
     if (error) {
-      toast.error(error.message);
+      toast.error("Error: " + error.message);
     } else {
       toast.success("Delivery added!"); 
       setIsModalOpen(false); 
@@ -156,7 +156,7 @@ export default function Deliveries() {
           >
             <div className="flex items-center justify-between p-6 border-b border-border/50">
               <h2 className="text-xl font-semibold">New Delivery</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 text-muted-foreground hover:bg-muted rounded-full">
+              <button onClick={() => setIsModalOpen(false)} className="p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -169,6 +169,8 @@ export default function Deliveries() {
                 <option value="ready">Ready</option>
                 <option value="waiting">Waiting</option>
                 <option value="done">Done</option>
+                <option value="draft">Draft</option>
+                <option value="canceled">Canceled</option>
               </select>
               <div className="pt-4 flex justify-end gap-3 border-t border-border/50 mt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors">Cancel</button>
