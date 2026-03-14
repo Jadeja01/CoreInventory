@@ -11,7 +11,7 @@ export default function SignIn() {
   e.preventDefault();
   
   // Using the credentials you requested:
-  if (email === "gandharvkumawat.23.cse@iite.indusuni.ac.in" && password === "password") {
+  if (email === "manager@aura-ims.com" && password === "password") {
     toast.success("Login successful!");
     
     // TELL THE BROWSER WE ARE LOGGED IN
