@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AppLayout } from "@/components/AppLayout";
+import SignIn from "./pages/SignIn";
+import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Receipts from "./pages/Receipts";
@@ -16,8 +18,6 @@ import Warehouses from "./pages/Warehouses";
 import SettingsPage from "./pages/SettingsPage";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-import SignIn from "./pages/SignIn";
-import ForgotPassword from "./pages/ForgotPassword";
 
 const queryClient = new QueryClient();
 
