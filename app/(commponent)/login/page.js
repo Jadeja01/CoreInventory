@@ -3,92 +3,76 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
-export default function Login() {
+export default function Login(){
 
-  const [error,setError] = useState("");
-  const [loading,setLoading] = useState(false);
+ const [error,setError]=useState("");
 
-  async function handleSubmit(e){
+ async function handleSubmit(e){
 
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
+  const email=e.target.email.value;
+  const password=e.target.password.value;
 
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+  const res=await signIn("credentials",{
+   email,
+   password,
+   redirect:false
+  });
 
-    const res = await signIn("credentials",{
-      email,
-      password,
-      redirect:false
-    });
-
-    setLoading(false);
-
-    if(res.error){
-      setError("Invalid email or password");
-    }else{
-      window.location.href="/dashboard";
-    }
-
+  if(res.error){
+   setError("Invalid credentials");
+  }else{
+   window.location.href="/dashboard";
   }
 
-  return (
+ }
 
-  <div className="min-h-screen flex items-center justify-center bg-gray-100">
+ return(
 
-    <div className="bg-white p-8 rounded-xl shadow w-96">
+ <div className="min-h-screen flex items-center justify-center bg-gray-100">
 
-      <h2 className="text-2xl font-bold text-center mb-6">
-        Inventory Login
-      </h2>
+  <form
+   onSubmit={handleSubmit}
+   className="bg-white p-8 rounded-xl shadow w-96 space-y-4"
+  >
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+   <h2 className="text-xl font-bold text-center">
+    Inventory Login
+   </h2>
 
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+   <input
+    name="email"
+    type="email"
+    placeholder="Email"
+    className="w-full border p-2 rounded"
+   />
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        />
+   <input
+    name="password"
+    type="password"
+    placeholder="Password"
+    className="w-full border p-2 rounded"
+   />
 
-        {error && (
-          <p className="text-red-500 text-sm">{error}</p>
-        )}
+   {error && (
+    <p className="text-red-500 text-sm">{error}</p>
+   )}
 
-        <button
-          disabled={loading}
-          className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
+   <button className="w-full bg-indigo-600 text-white py-2 rounded">
+    Login
+   </button>
 
-      </form>
+   <a
+    href="/forgot-password"
+    className="text-sm text-indigo-600"
+   >
+    Forgot Password?
+   </a>
 
-      <div className="text-center mt-4">
+  </form>
 
-        <a
-          href="/forgot-password"
-          className="text-sm text-indigo-600 hover:underline"
-        >
-          Forgot Password?
-        </a>
+ </div>
 
-      </div>
-
-    </div>
-
-  </div>
-
-  );
+ )
 }

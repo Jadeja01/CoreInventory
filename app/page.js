@@ -26,18 +26,6 @@ export default function Home() {
             in real-time with a powerful inventory management platform.
           </p>
 
-          <div className="flex gap-4">
-
-            <button className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-              Get Started
-            </button>
-
-            <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100">
-              Live Demo
-            </button>
-
-          </div>
-
         </div>
 
         <div className="mt-12 md:mt-0">
@@ -131,29 +119,8 @@ export default function Home() {
       </section>
 
 
-      {/* CTA */}
-      <section className="bg-indigo-600 text-white py-20 text-center">
-
-        <h2 className="text-4xl font-bold mb-4">
-          Start Managing Inventory Smarter
-        </h2>
-
-        <p className="mb-8 text-lg">
-          Replace spreadsheets and manual registers with
-          a modern inventory system.
-        </p>
-
-        <button className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200">
-          Create Free Account
-        </button>
-
-      </section>
-
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-10 text-center">
-        <p>© 2026 CoreInventory. All rights reserved.</p>
-      </footer>
+     
+     
 
     </main>
   );

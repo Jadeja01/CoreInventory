@@ -1,14 +1,14 @@
-import clientPromise from "@/lib/mongodb";
+import connectDB from "@/lib/mongodb";
+import User from "@/lib/models/User";
 import nodemailer from "nodemailer";
 
 export async function POST(req){
 
  const {email} = await req.json();
 
- const client = await clientPromise;
- const db = client.db();
+ await connectDB();
 
- const user = await db.collection("users").findOne({email});
+ const user = await User.findOne({email});
 
  if(!user){
   return Response.json({error:"User not found"});
@@ -31,15 +31,10 @@ export async function POST(req){
   text:`Your OTP is ${otp}`
  });
 
- await db.collection("users").updateOne(
-  {email},
-  {
-   $set:{
-    otp,
-    otpExpire: Date.now() + 300000
-   }
-  }
- );
+ user.otp = otp;
+ user.otpExpire = Date.now() + 300000;
+
+ await user.save();
 
  return Response.json({success:true});
 }
