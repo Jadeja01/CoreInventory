@@ -8,15 +8,20 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
 
   const handleEmailLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // MOCK LOGIN LOGIC: Replace this with real backend auth later
-    if (email === "gandharvkumawat.23.cse@iite.indusuni.ac.in" && password === "password") {
-      toast.success("Login successful!");
-      navigate("/dashboard"); // Redirect to your dashboard
-    } else {
-      toast.error("Invalid email or password");
-    }
-  };
+  e.preventDefault();
+  
+  // Using the credentials you requested:
+  if (email === "gandharvkumawat.23.cse@iite.indusuni.ac.in" && password === "password") {
+    toast.success("Login successful!");
+    
+    // TELL THE BROWSER WE ARE LOGGED IN
+    localStorage.setItem("isAuthenticated", "true"); 
+    
+    navigate("/"); // Redirect to dashboard
+  } else {
+    toast.error("Invalid email or password");
+  }
+};
 
   const handleGoogleLogin = () => {
     // MOCK GOOGLE LOGIN: Replace with Firebase/Supabase Google Auth
