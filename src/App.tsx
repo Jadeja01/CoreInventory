@@ -1,5 +1,6 @@
 import SignIn from "./pages/SignIn";
 import ForgotPassword from "./pages/ForgotPassword";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -30,18 +31,23 @@ const App = () => (
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AppLayout>
             <Routes>
+              {/* PUBLIC ROUTES: Anyone can see these, and there is no Sidebar */}
               <Route path="/signin" element={<SignIn />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/receipts" element={<Receipts />} />
-              <Route path="/deliveries" element={<Deliveries />} />
-              <Route path="/transfers" element={<Transfers />} />
-              <Route path="/adjustments" element={<Adjustments />} />
-              <Route path="/history" element={<MoveHistory />} />
-              <Route path="/warehouses" element={<Warehouses />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/profile" element={<Profile />} />
+              
+              {/* PROTECTED ROUTES: Only logged-in users get past this point */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/receipts" element={<Receipts />} />
+                <Route path="/deliveries" element={<Deliveries />} />
+                <Route path="/transfers" element={<Transfers />} />
+                <Route path="/adjustments" element={<Adjustments />} />
+                <Route path="/history" element={<MoveHistory />} />
+                <Route path="/warehouses" element={<Warehouses />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
