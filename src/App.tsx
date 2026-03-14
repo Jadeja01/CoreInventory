@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AppLayout } from "@/components/AppLayout";
-import { ProtectedRoute } from "@/components/ProtectedRoutes";
+import { ProtectedRoutes } from "@/components/ProtectedRoutes";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Receipts from "./pages/Receipts";
