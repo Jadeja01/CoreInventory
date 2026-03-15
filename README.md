@@ -1,1 +1,1 @@
-Check master branch for problem statement solution
+Check GK branch for problem statement solution
