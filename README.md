@@ -1,3 +1,5 @@
+# CoreInventory
 
+Odoo x Indus University Hackathon
 
-visit link: https://jadeja01.github.io/CoreInventory
+#Priorities this solution
